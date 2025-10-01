@@ -35,14 +35,21 @@ class GitHubSyncService {
         if (savedGistId) {
             this.gistId = savedGistId;
             console.log('Найден сохраненный Gist ID:', this.gistId);
+        } else {
+            console.log('Gist ID не найден в localStorage');
         }
         
         // Загружаем сохраненный GitHub токен
         const savedToken = localStorage.getItem('gangsters_github_token');
         if (savedToken) {
             this.githubToken = savedToken;
-            console.log('Найден сохраненный GitHub токен');
+            console.log('Найден сохраненный GitHub токен, длина:', savedToken.length);
+        } else {
+            console.log('GitHub токен не найден в localStorage');
         }
+        
+        // Проверяем все ключи в localStorage
+        console.log('Все ключи в localStorage:', Object.keys(localStorage).filter(key => key.startsWith('gangsters')));
         
         // Запускаем периодическую синхронизацию
         this.startPeriodicSync();
@@ -57,7 +64,15 @@ class GitHubSyncService {
     setGitHubToken(token) {
         this.githubToken = token;
         localStorage.setItem('gangsters_github_token', token);
-        console.log('GitHub токен установлен и сохранен');
+        console.log('GitHub токен установлен и сохранен, длина:', token.length);
+        
+        // Проверяем, что токен действительно сохранился
+        const savedToken = localStorage.getItem('gangsters_github_token');
+        if (savedToken === token) {
+            console.log('✅ Токен успешно сохранен в localStorage');
+        } else {
+            console.error('❌ Ошибка сохранения токена в localStorage');
+        }
         
         // Показываем уведомление
         this.updateSyncStatus('GitHub токен сохранен');
@@ -323,13 +338,18 @@ class GitHubSyncService {
      */
     checkTokenStatus() {
         const savedToken = localStorage.getItem('gangsters_github_token');
+        console.log('=== СТАТУС ТОКЕНА ===');
         console.log('Токен в localStorage:', savedToken ? `${savedToken.substring(0, 8)}...` : 'Нет');
         console.log('Токен в памяти:', this.githubToken ? `${this.githubToken.substring(0, 8)}...` : 'Нет');
         console.log('Gist ID:', this.gistId || 'Нет');
+        console.log('Все gangsters ключи в localStorage:', Object.keys(localStorage).filter(key => key.startsWith('gangsters')));
+        console.log('==================');
         return {
             hasTokenInStorage: !!savedToken,
             hasTokenInMemory: !!this.githubToken,
-            hasGistId: !!this.gistId
+            hasGistId: !!this.gistId,
+            tokenInStorage: savedToken,
+            tokenInMemory: this.githubToken
         };
     }
     

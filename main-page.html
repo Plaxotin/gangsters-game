@@ -458,6 +458,18 @@
                             font-weight: bold;
                             min-width: 60px;
                         ">📂 Загрузить</button>
+                        <button onclick="checkTokenStatus()" style="
+                            background: linear-gradient(45deg, #ff9800, #f57c00);
+                            border: 1px solid var(--warm-gold);
+                            color: var(--cream);
+                            padding: 0.25rem 0.5rem;
+                            font-family: var(--font-sans);
+                            cursor: pointer;
+                            font-size: 0.7rem;
+                            border-radius: 3px;
+                            font-weight: bold;
+                            min-width: 60px;
+                        ">🔍 Проверить</button>
                     </div>
                     
                     </div>
@@ -535,6 +547,25 @@
                                 font-weight: 600;
                                 cursor: pointer;
                             ">Установить токен</button>
+                            <button onclick="checkTokenStatus()" style="
+                                background: linear-gradient(45deg, #ff9800, #f57c00);
+                                border: 2px solid var(--warm-gold);
+                                color: var(--cream);
+                                padding: 0.5rem 1rem;
+                                border-radius: 4px;
+                                font-weight: 600;
+                                cursor: pointer;
+                            ">Проверить статус</button>
+                            <button onclick="resetGitHubToken()" id="reset-token-btn" style="
+                                background: linear-gradient(45deg, #f44336, #d32f2f);
+                                border: 2px solid var(--warm-gold);
+                                color: var(--cream);
+                                padding: 0.5rem 1rem;
+                                border-radius: 4px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                display: none;
+                            ">Сбросить токен</button>
                             <button onclick="forceGitHubSync()" style="
                                 background: linear-gradient(45deg, #2196f3, #1976d2);
                                 border: 2px solid var(--warm-gold);
@@ -1107,6 +1138,79 @@
                         githubStatus.textContent = 'Токен не установлен';
                     }
                 }
+                
+                // Обновляем состояние кнопки "Установить токен"
+                updateTokenButtonState(githubInfo.hasToken);
+            }
+        }
+        
+        function updateTokenButtonState(hasToken) {
+            const tokenButton = document.querySelector('button[onclick="setGitHubToken()"]');
+            const tokenInput = document.getElementById('github-token');
+            const resetButton = document.getElementById('reset-token-btn');
+            
+            if (tokenButton && tokenInput) {
+                if (hasToken) {
+                    // Токен установлен - делаем кнопку неактивной
+                    tokenButton.disabled = true;
+                    tokenButton.style.background = 'linear-gradient(45deg, #666, #444)';
+                    tokenButton.style.cursor = 'not-allowed';
+                    tokenButton.style.opacity = '0.6';
+                    tokenButton.textContent = 'Токен установлен';
+                    
+                    // Показываем кнопку сброса токена
+                    if (resetButton) {
+                        resetButton.style.display = 'inline-block';
+                    }
+                    
+                    // Скрываем поле ввода токена
+                    tokenInput.style.display = 'none';
+                    tokenInput.value = '';
+                    
+                    // Показываем информацию о токене
+                    const tokenInfo = document.createElement('div');
+                    tokenInfo.id = 'token-info';
+                    tokenInfo.style.cssText = `
+                        background: rgba(76, 175, 80, 0.2);
+                        border: 1px solid #4caf50;
+                        border-radius: 4px;
+                        padding: 0.5rem;
+                        color: #4caf50;
+                        font-size: 0.8rem;
+                        margin-top: 0.5rem;
+                    `;
+                    tokenInfo.innerHTML = '✅ GitHub токен установлен и сохранен';
+                    
+                    // Удаляем старую информацию если есть
+                    const oldTokenInfo = document.getElementById('token-info');
+                    if (oldTokenInfo) {
+                        oldTokenInfo.remove();
+                    }
+                    
+                    // Добавляем новую информацию
+                    tokenInput.parentNode.appendChild(tokenInfo);
+                } else {
+                    // Токен не установлен - делаем кнопку активной
+                    tokenButton.disabled = false;
+                    tokenButton.style.background = 'linear-gradient(45deg, #4caf50, #388e3c)';
+                    tokenButton.style.cursor = 'pointer';
+                    tokenButton.style.opacity = '1';
+                    tokenButton.textContent = 'Установить токен';
+                    
+                    // Скрываем кнопку сброса токена
+                    if (resetButton) {
+                        resetButton.style.display = 'none';
+                    }
+                    
+                    // Показываем поле ввода токена
+                    tokenInput.style.display = 'block';
+                    
+                    // Удаляем информацию о токене
+                    const tokenInfo = document.getElementById('token-info');
+                    if (tokenInfo) {
+                        tokenInfo.remove();
+                    }
+                }
             }
         }
         
@@ -1115,14 +1219,63 @@
             if (tokenInput && tokenInput.value.trim()) {
                 if (window.githubSyncService) {
                     window.githubSyncService.setGitHubToken(tokenInput.value.trim());
+                    
+                    // Обновляем интерфейс
                     updateSyncInfo();
-                    tokenInput.value = ''; // Очищаем поле ввода
+                    
+                    // Очищаем поле ввода
+                    tokenInput.value = '';
+                    
+                    // Показываем уведомление
                     alert('GitHub токен установлен и сохранен!');
+                    
+                    // Проверяем статус токена после установки
+                    setTimeout(() => {
+                        window.githubSyncService.checkTokenStatus();
+                    }, 1000);
                 }
             } else {
                 alert('Введите GitHub токен');
             }
         }
+        
+        // Функция для проверки статуса токена
+        function checkTokenStatus() {
+            if (window.githubSyncService) {
+                window.githubSyncService.checkTokenStatus();
+            } else {
+                console.log('GitHub синхронизация не инициализирована');
+            }
+        }
+        
+        // Функция для сброса токена
+        function resetGitHubToken() {
+            if (confirm('Вы уверены, что хотите сбросить GitHub токен? Это отключит синхронизацию с облаком.')) {
+                if (window.githubSyncService) {
+                    // Очищаем токен из localStorage
+                    localStorage.removeItem('gangsters_github_token');
+                    
+                    // Очищаем токен из памяти
+                    window.githubSyncService.githubToken = null;
+                    
+                    // Обновляем интерфейс
+                    updateSyncInfo();
+                    
+                    // Показываем уведомление
+                    alert('GitHub токен сброшен. Синхронизация с облаком отключена.');
+                    
+                    console.log('GitHub токен сброшен');
+                }
+            }
+        }
+        
+        // Проверяем статус токена при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                console.log('Проверяем статус токена при загрузке страницы...');
+                checkTokenStatus();
+            }, 2000);
+        });
     </script>
 </body>
 </html>
