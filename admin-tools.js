@@ -334,8 +334,8 @@ function updateEstablishmentVisualization(establishment) {
     }
     
     // Сохраняем изменения
-    if (typeof window.saveMarkupDataToLocalStorage === 'function') {
-        window.saveMarkupDataToLocalStorage();
+    if (typeof window.saveMarkupDataToCloud === 'function') {
+        window.saveMarkupDataToCloud();
     }
 }
 
@@ -525,7 +525,7 @@ function attemptCapture(establishmentId) {
             }
             
             // Сохраняем изменения в заведениях
-            saveMarkupDataToLocalStorage();
+            saveMarkupDataToCloud();
             
             // Синхронизация с облаком
             if (window.githubSyncService && window.githubSyncService.githubToken) {
@@ -611,7 +611,7 @@ function attemptBuy(establishmentId) {
         updateEstablishmentVisualization(establishment);
         
         // Сохраняем изменения в заведениях
-        saveMarkupDataToLocalStorage();
+        saveMarkupDataToCloud();
         
         // Синхронизация с облаком
         if (window.githubSyncService && window.githubSyncService.githubToken) {
@@ -685,7 +685,7 @@ function attemptSellEstablishment(establishmentId) {
             }
             
             // Сохраняем изменения в заведениях
-            saveMarkupDataToLocalStorage();
+            saveMarkupDataToCloud();
             
             // Синхронизация с облаком
             if (window.githubSyncService && window.githubSyncService.githubToken) {
@@ -755,16 +755,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     setTimeout(() => {
                         if (currentMarkupData.establishments.length === 0) {
                             console.log('Из облака не загрузилось, загружаем из localStorage...');
-                            loadMarkupDataFromLocalStorage();
+                            loadMarkupDataFromCloud();
                         }
                     }, 500);
                 }).catch(error => {
                     console.log('Не удалось загрузить из облака, загружаем из localStorage:', error);
-                    loadMarkupDataFromLocalStorage();
+                    loadMarkupDataFromCloud();
                 });
             } else {
                 console.log('Нет токена GitHub, загружаем из localStorage...');
-                loadMarkupDataFromLocalStorage();
+                loadMarkupDataFromCloud();
             }
             
             // Проверяем наличие данных через 3 секунды
@@ -789,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         if (currentMarkupData.establishments.length === 0) {
             console.log('Дополнительная проверка: загружаем данные...');
-            loadMarkupDataFromLocalStorage();
+            loadMarkupDataFromCloud();
         }
     }, 5000);
     
@@ -798,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Событие mapReady получено, загружаем данные...');
         setTimeout(() => {
             if (currentMarkupData.establishments.length === 0) {
-                loadMarkupDataFromLocalStorage();
+                loadMarkupDataFromCloud();
             }
         }, 1000);
     });
@@ -1156,7 +1156,7 @@ function finishPolygon() {
     updateMarkupStats();
     
     // Автосохранение
-    saveMarkupDataToLocalStorage();
+    saveMarkupDataToCloud();
     
     showMessage(`Территория для "${selectedEstablishment.name}" создана! Точки: ${polygonPoints.length}`, 'success');
     
@@ -1636,7 +1636,7 @@ function saveEstablishmentChanges(establishmentId) {
     hideEditEstablishmentForm();
     
     // Автосохранение
-    saveMarkupDataToLocalStorage();
+    saveMarkupDataToCloud();
     
     // Обновляем селектор заведений
     if (typeof updateEstablishmentSelector === 'function') {
@@ -1757,7 +1757,7 @@ function actuallyDeleteEstablishment(establishmentId) {
     deleteConfirmationState.confirmed = false;
     
     // Автосохранение
-    saveMarkupDataToLocalStorage();
+    saveMarkupDataToCloud();
     
     // Обновляем селектор заведений
     if (typeof updateEstablishmentSelector === 'function') {
@@ -2082,7 +2082,7 @@ function finalizeEstablishmentCreation(e = null) {
     document.getElementById('new-establishment-name').value = '';
     
     // Автосохранение
-    saveMarkupDataToLocalStorage();
+    saveMarkupDataToCloud();
     
     // Синхронизация с облаком
     if (window.githubSyncService && window.githubSyncService.githubToken) {
@@ -2730,10 +2730,10 @@ function updateMarkupStats() {
     `;
 }
 
-// Сохранение данных разметки в localStorage
-function saveMarkupDataToLocalStorage() {
+// Сохранение данных разметки в облако (GitHub Gist)
+function saveMarkupDataToCloud() {
     try {
-        console.log('Сохраняем данные разметки...', currentMarkupData);
+        console.log('Сохраняем данные разметки в облако...', currentMarkupData);
         
         const dataToSave = {
             establishments: currentMarkupData.establishments.map(establishment => {
@@ -2759,121 +2759,66 @@ function saveMarkupDataToLocalStorage() {
         console.log('Данные для сохранения:', dataToSave);
         console.log('Заведения с владельцами:', dataToSave.establishments.filter(e => e.owner));
         
-        // Сохраняем в localStorage
-        localStorage.setItem('gangsters_markup_data', JSON.stringify(dataToSave));
-        
-        // Также сохраняем в глобальную переменную для синхронизации
+        // Сохраняем в глобальную переменную для синхронизации
         window.currentMarkupData = currentMarkupData;
         
-        console.log(`Данные разметки сохранены в localStorage. Заведений: ${dataToSave.establishments.length}, с владельцами: ${dataToSave.establishments.filter(e => e.owner).length}`);
-        
-        // Показываем уведомление
-        if (typeof showMessage === 'function') {
-            showMessage(`Сохранено ${dataToSave.establishments.length} заведений`, 'success');
+        // Синхронизируем с облаком
+        if (window.githubSyncService && window.githubSyncService.githubToken) {
+            window.githubSyncService.syncToGist().then(() => {
+                console.log(`Данные разметки сохранены в облако. Заведений: ${dataToSave.establishments.length}, с владельцами: ${dataToSave.establishments.filter(e => e.owner).length}`);
+                
+                // Показываем уведомление
+                if (typeof showMessage === 'function') {
+                    showMessage(`Сохранено ${dataToSave.establishments.length} заведений в облако`, 'success');
+                }
+            }).catch(error => {
+                console.error('Ошибка синхронизации с облаком:', error);
+                if (typeof showMessage === 'function') {
+                    showMessage('Ошибка синхронизации с облаком', 'error');
+                }
+            });
+        } else {
+            console.log('Нет токена GitHub для синхронизации');
+            if (typeof showMessage === 'function') {
+                showMessage('Нет токена GitHub для синхронизации', 'error');
+            }
         }
     } catch (error) {
-        console.error('Ошибка сохранения в localStorage:', error);
+        console.error('Ошибка сохранения в облако:', error);
         if (typeof showMessage === 'function') {
             showMessage('Ошибка сохранения данных', 'error');
         }
     }
 }
 
-// Загрузка данных разметки из localStorage
-function loadMarkupDataFromLocalStorage() {
+// Загрузка данных разметки из облака (GitHub Gist)
+function loadMarkupDataFromCloud() {
     try {
-        const savedData = localStorage.getItem('gangsters_markup_data');
-        console.log('Загружаем данные из localStorage:', savedData);
+        console.log('Загружаем данные из облака...');
         
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            console.log('Распарсенные данные:', data);
-            
-            // Восстанавливаем заведения
-            if (data.establishments && Array.isArray(data.establishments)) {
-                console.log(`Найдено ${data.establishments.length} заведений для загрузки`);
+        // Синхронизируем с облаком
+        if (window.githubSyncService && window.githubSyncService.githubToken) {
+            window.githubSyncService.syncFromGist().then(() => {
+                console.log('Данные загружены из облака');
                 
-                // Очищаем существующие заведения
-                if (currentMarkupData.establishments) {
-                    currentMarkupData.establishments.forEach(establishment => {
-                        if (establishment.marker && window.gangsterMap) {
-                            window.gangsterMap.removeLayer(establishment.marker);
-                        }
-                        if (establishment.polygon && window.gangsterMap) {
-                            window.gangsterMap.removeLayer(establishment.polygon);
-                        }
-                    });
+                // Показываем уведомление
+                if (typeof showMessage === 'function') {
+                    showMessage('Данные загружены из облака', 'success');
                 }
-                currentMarkupData.establishments = [];
-                
-                data.establishments.forEach(establishmentData => {
-                    // Создаем маркер на карте
-                    if (window.gangsterMap && establishmentData.coords) {
-                        console.log('Восстанавливаем заведение:', establishmentData.name, 'Владелец:', establishmentData.owner);
-                        
-                        // Проверяем, есть ли владелец
-                        if (establishmentData.owner) {
-                            console.log('Заведение имеет владельца:', establishmentData.owner.name, 'Цвет:', establishmentData.owner.color);
-                        }
-                        
-                        // Добавляем заведение в текущие данные
-                        currentMarkupData.establishments.push(establishmentData);
-                        
-                        // Создаем маркер на карте
-                        addMarkupEstablishment(establishmentData);
-                        
-                        // Восстанавливаем полигон территории если есть
-                        console.log('Проверяем территорию для заведения:', establishmentData.name, 'Территория:', establishmentData.territory);
-                        if (establishmentData.territory && establishmentData.territory.polygon) {
-                            console.log('Восстанавливаем полигон территории для:', establishmentData.name);
-                            const lastEstablishment = currentMarkupData.establishments[currentMarkupData.establishments.length - 1];
-                            if (lastEstablishment) {
-                                // Создаем полигон территории
-                                const territoryPolygon = L.polygon(establishmentData.territory.polygon, {
-                                    fillColor: establishmentData.territory.color,
-                                    fillOpacity: establishmentData.territory.opacity || 0.3,
-                                    color: establishmentData.territory.color,
-                                    weight: 2,
-                                    opacity: 0.8,
-                                    className: 'final-territory-polygon'
-                                }).addTo(window.gangsterMap);
-                                
-                                // Сохраняем ссылку на полигон
-                                lastEstablishment.polygon = territoryPolygon;
-                                
-                                // Восстанавливаем имя владельца на территории если есть
-                                if (establishmentData.owner) {
-                                    addOwnerLabelToTerritory(lastEstablishment);
-                                }
-                                
-                                console.log('Полигон территории восстановлен для:', establishmentData.name);
-                            }
-                        } else {
-                            console.log('Нет территории для заведения:', establishmentData.name);
-                        }
-                    }
-                });
-                
-                updateMarkupStats();
-                
-                // Обновляем селектор заведений
-                if (typeof updateEstablishmentSelector === 'function') {
-                    updateEstablishmentSelector();
+            }).catch(error => {
+                console.error('Ошибка загрузки из облака:', error);
+                if (typeof showMessage === 'function') {
+                    showMessage('Ошибка загрузки из облака', 'error');
                 }
-                
-                if (data.establishments.length > 0) {
-                    showMessage(`Загружено ${data.establishments.length} заведений`, 'success');
-                }
-                console.log('Данные разметки загружены из localStorage');
-                
-                // Обновляем глобальную переменную для синхронизации
-                window.currentMarkupData = currentMarkupData;
-            }
+            });
         } else {
-            console.log('Нет сохраненных данных разметки');
+            console.log('Нет токена GitHub для синхронизации');
+            if (typeof showMessage === 'function') {
+                showMessage('Нет токена GitHub для синхронизации', 'error');
+            }
         }
     } catch (error) {
-        console.error('Ошибка загрузки из localStorage:', error);
+        console.error('Ошибка загрузки из облака:', error);
         if (typeof showMessage === 'function') {
             showMessage('Ошибка загрузки данных', 'error');
         }
@@ -2962,7 +2907,7 @@ function clearAllMarkup() {
         updateMarkupStats();
         
         // Автосохранение
-        saveMarkupDataToLocalStorage();
+        saveMarkupDataToCloud();
         
         showMessage('Все данные разметки очищены!', 'success');
     }
@@ -3055,8 +3000,8 @@ window.confirmDeleteEstablishment = confirmDeleteEstablishment;
 window.cancelDeleteEstablishment = cancelDeleteEstablishment;
 window.saveMarkupData = saveMarkupData;
 window.loadMarkupData = loadMarkupData;
-window.saveMarkupDataToLocalStorage = saveMarkupDataToLocalStorage;
-window.loadMarkupDataFromLocalStorage = loadMarkupDataFromLocalStorage;
+window.saveMarkupDataToCloud = saveMarkupDataToCloud;
+window.loadMarkupDataFromCloud = loadMarkupDataFromCloud;
 window.exportMarkupData = exportMarkupData;
 window.clearAllMarkup = clearAllMarkup;
 window.finishPolygon = finishPolygon;
@@ -3113,7 +3058,7 @@ function createTestEstablishments() {
     });
     
     // Сохраняем данные
-    saveMarkupDataToLocalStorage();
+    saveMarkupDataToCloud();
     
     // Обновляем селектор заведений
     if (typeof updateEstablishmentSelector === 'function') {
@@ -3130,7 +3075,7 @@ window.createTestEstablishments = createTestEstablishments;
 function forceLoadMarkupData() {
     console.log('Принудительная загрузка данных разметки...');
     if (window.gangsterMap) {
-        loadMarkupDataFromLocalStorage();
+        loadMarkupDataFromCloud();
         console.log('Данные загружены');
     } else {
         console.log('Карта не найдена');
@@ -3150,10 +3095,7 @@ async function forceCloudSync() {
     console.log('Принудительная синхронизация с облаком...');
     if (window.githubSyncService && window.githubSyncService.githubToken) {
         try {
-            // Сначала сохраняем локальные данные
-            saveMarkupDataToLocalStorage();
-            
-            // Затем синхронизируем с облаком
+            // Синхронизируем с облаком
             await window.githubSyncService.syncToGist();
             console.log('Данные синхронизированы с облаком');
             
@@ -3178,8 +3120,8 @@ async function forceCloudSync() {
 // Функция для принудительной загрузки данных при взаимодействии
 function ensureDataLoaded() {
     if (currentMarkupData.establishments.length === 0) {
-        console.log('Данные не загружены, принудительно загружаем...');
-        loadMarkupDataFromLocalStorage();
+        console.log('Данные не загружены, принудительно загружаем из облака...');
+        loadMarkupDataFromCloud();
     }
 }
 
