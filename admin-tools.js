@@ -529,12 +529,16 @@ function attemptCapture(establishmentId) {
             
             // Синхронизация с облаком
             if (window.githubSyncService && window.githubSyncService.githubToken) {
-                window.githubSyncService.syncToGist().catch(error => {
-                    console.error('Ошибка синхронизации с облаком:', error);
+                window.githubSyncService.syncToGist().then(() => {
+                    console.log('Захват заведения синхронизирован с облаком');
+                    showMessage(`Заведение "${establishment.name}" захвачено и сохранено в облаке! Доход: $${establishment.income}/час`, 'success');
+                }).catch(error => {
+                    console.error('Ошибка синхронизации захвата с облаком:', error);
+                    showMessage(`Заведение "${establishment.name}" захвачено, но не сохранено в облаке`, 'error');
                 });
+            } else {
+                showMessage(`Заведение "${establishment.name}" захвачено, но не сохранено в облаке (нет токена)`, 'error');
             }
-            
-            showMessage(`Заведение "${establishment.name}" захвачено! Доход: $${establishment.income}/час`, 'success');
             
             // Закрываем popup
             window.gangsterMap.closePopup();
@@ -610,18 +614,19 @@ function attemptBuy(establishmentId) {
         // Обновляем визуализацию заведения на карте
         updateEstablishmentVisualization(establishment);
         
-        // Сохраняем изменения в заведениях
-        saveMarkupDataToCloud();
-        
         // Синхронизация с облаком
         if (window.githubSyncService && window.githubSyncService.githubToken) {
-            window.githubSyncService.syncToGist().catch(error => {
-                console.error('Ошибка синхронизации с облаком:', error);
+            window.githubSyncService.syncToGist().then(() => {
+                console.log('Покупка заведения синхронизирована с облаком');
+                showMessage(`Заведение "${establishment.name}" куплено и сохранено в облаке за $${establishment.captureCost}! Доход: $${establishment.income}/час`, 'success');
+            }).catch(error => {
+                console.error('Ошибка синхронизации покупки с облаком:', error);
+                showMessage(`Заведение "${establishment.name}" куплено, но не сохранено в облаке`, 'error');
             });
+        } else {
+            showMessage(`Заведение "${establishment.name}" куплено, но не сохранено в облаке (нет токена)`, 'error');
         }
     }
-    
-    showMessage(`Заведение "${establishment.name}" куплено за $${establishment.captureCost}! Доход: $${establishment.income}/час`, 'success');
     
     // Закрываем popup
     window.gangsterMap.closePopup();
@@ -684,17 +689,18 @@ function attemptSellEstablishment(establishmentId) {
                 window.saveCurrentUser();
             }
             
-            // Сохраняем изменения в заведениях
-            saveMarkupDataToCloud();
-            
             // Синхронизация с облаком
             if (window.githubSyncService && window.githubSyncService.githubToken) {
-                window.githubSyncService.syncToGist().catch(error => {
-                    console.error('Ошибка синхронизации с облаком:', error);
+                window.githubSyncService.syncToGist().then(() => {
+                    console.log('Продажа заведения синхронизирована с облаком');
+                    showMessage(`Заведение "${establishment.name}" продано и сохранено в облаке за $${sellPrice}!`, 'success');
+                }).catch(error => {
+                    console.error('Ошибка синхронизации продажи с облаком:', error);
+                    showMessage(`Заведение "${establishment.name}" продано, но не сохранено в облаке`, 'error');
                 });
+            } else {
+                showMessage(`Заведение "${establishment.name}" продано, но не сохранено в облаке (нет токена)`, 'error');
             }
-            
-            showMessage(`Заведение "${establishment.name}" продано за $${sellPrice}!`, 'success');
             
             // Закрываем popup
             window.gangsterMap.closePopup();
@@ -1155,10 +1161,20 @@ function finishPolygon() {
     // Обновляем статистику
     updateMarkupStats();
     
-    // Автосохранение
-    saveMarkupDataToCloud();
-    
-    showMessage(`Территория для "${selectedEstablishment.name}" создана! Точки: ${polygonPoints.length}`, 'success');
+    // Сохраняем территорию в облако сразу после создания
+    if (window.githubSyncService && window.githubSyncService.githubToken) {
+        console.log('Синхронизируем новую территорию с облаком...');
+        window.githubSyncService.syncToGist().then(() => {
+            console.log('Территория синхронизирована с облаком');
+            showMessage(`Территория для "${selectedEstablishment.name}" создана и сохранена в облаке! Точки: ${polygonPoints.length}`, 'success');
+        }).catch(error => {
+            console.error('Ошибка синхронизации территории с облаком:', error);
+            showMessage(`Территория для "${selectedEstablishment.name}" создана, но не сохранена в облаке`, 'error');
+        });
+    } else {
+        console.log('Нет токена GitHub для синхронизации территории');
+        showMessage(`Территория для "${selectedEstablishment.name}" создана, но не сохранена в облаке (нет токена)`, 'error');
+    }
     
     // Автоматически отключаем режим разметки
     const markupBtn = document.getElementById('markup-toggle-btn');
@@ -2081,17 +2097,19 @@ function finalizeEstablishmentCreation(e = null) {
     // Очищаем форму
     document.getElementById('new-establishment-name').value = '';
     
-    // Автосохранение
-    saveMarkupDataToCloud();
-    
-    // Синхронизация с облаком
+    // Сохраняем в облако сразу после создания
     if (window.githubSyncService && window.githubSyncService.githubToken) {
-        console.log('Синхронизируем заведения с облаком...');
+        console.log('Синхронизируем новое заведение с облаком...');
         window.githubSyncService.syncToGist().then(() => {
-            console.log('Заведения синхронизированы с облаком');
+            console.log('Заведение синхронизировано с облаком');
+            showMessage(`Заведение "${establishment.name}" создано и сохранено в облаке!`, 'success');
         }).catch(error => {
             console.error('Ошибка синхронизации с облаком:', error);
+            showMessage(`Заведение "${establishment.name}" создано, но не сохранено в облаке`, 'error');
         });
+    } else {
+        console.log('Нет токена GitHub для синхронизации');
+        showMessage(`Заведение "${establishment.name}" создано, но не сохранено в облаке (нет токена)`, 'error');
     }
     
     // Обновляем селектор заведений
@@ -2101,14 +2119,8 @@ function finalizeEstablishmentCreation(e = null) {
     
     // Дополнительная проверка сохранения
     setTimeout(() => {
-        const savedData = localStorage.getItem('gangsters_markup_data');
-        if (savedData) {
-            const data = JSON.parse(savedData);
-            console.log(`Проверка сохранения: в localStorage ${data.establishments.length} заведений`);
-        }
+        console.log(`Проверка: в памяти ${currentMarkupData.establishments.length} заведений`);
     }, 100);
-    
-    showMessage(`Заведение "${establishment.name}" создано!`, 'success');
 }
 
 // Отмена создания заведения
@@ -2906,10 +2918,18 @@ function clearAllMarkup() {
         };
         updateMarkupStats();
         
-        // Автосохранение
-        saveMarkupDataToCloud();
-        
-        showMessage('Все данные разметки очищены!', 'success');
+        // Синхронизация очистки с облаком
+        if (window.githubSyncService && window.githubSyncService.githubToken) {
+            window.githubSyncService.syncToGist().then(() => {
+                console.log('Очистка данных синхронизирована с облаком');
+                showMessage('Все данные разметки очищены и сохранены в облаке!', 'success');
+            }).catch(error => {
+                console.error('Ошибка синхронизации очистки с облаком:', error);
+                showMessage('Данные очищены, но не сохранены в облаке', 'error');
+            });
+        } else {
+            showMessage('Данные очищены, но не сохранены в облаке (нет токена)', 'error');
+        }
     }
 }
 
