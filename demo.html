@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gangsters: Real City - Демо</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="game-container">
+        <!-- Загрузочный экран -->
+        <div id="loading-screen" class="screen active">
+            <div class="loading-content">
+                <h1>Gangsters: Real City</h1>
+                <div class="loading-spinner"></div>
+                <p>Демо-версия без карты</p>
+                <button class="menu-btn" onclick="startDemo()" style="margin-top: 20px;">Начать демо</button>
+            </div>
+        </div>
+
+        <!-- Главное меню -->
+        <div id="main-menu" class="screen">
+            <div class="menu-content">
+                <h1>Gangsters: Real City</h1>
+                <div class="player-info">
+                    <div class="player-avatar"></div>
+                    <div class="player-stats">
+                        <span class="player-name">Игрок</span>
+                        <span class="player-money">$1000</span>
+                        <span class="player-level">Уровень 1</span>
+                    </div>
+                </div>
+                <div class="menu-buttons">
+                    <button class="menu-btn" onclick="showDemoMap()">Карта (демо)</button>
+                    <button class="menu-btn" onclick="showClanMenu()">Кланы</button>
+                    <button class="menu-btn" onclick="showInventory()">Инвентарь</button>
+                    <button class="menu-btn" onclick="showAchievements()">Достижения</button>
+                    <button class="menu-btn" onclick="showSettings()">Настройки</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Демо карта -->
+        <div id="demo-map" class="screen">
+            <div class="demo-map-container">
+                <h2>Демо-карта</h2>
+                <div class="demo-venues">
+                    <div class="demo-venue" onclick="selectDemoVenue('cafe1')">
+                        <h3>Кафе "Уютное"</h3>
+                        <p>Тип: Малое заведение</p>
+                        <p>Доход: $10/час</p>
+                        <p>Статус: Свободно</p>
+                    </div>
+                    <div class="demo-venue" onclick="selectDemoVenue('restaurant1')">
+                        <h3>Ресторан "Престиж"</h3>
+                        <p>Тип: Среднее заведение</p>
+                        <p>Доход: $30/час</p>
+                        <p>Статус: Свободно</p>
+                    </div>
+                    <div class="demo-venue" onclick="selectDemoVenue('mall1')">
+                        <h3>ТЦ "Мегаполис"</h3>
+                        <p>Тип: Крупное заведение</p>
+                        <p>Доход: $100/час</p>
+                        <p>Статус: Свободно</p>
+                    </div>
+                </div>
+                <button class="menu-btn" onclick="showMainMenu()">Назад в меню</button>
+            </div>
+        </div>
+
+        <!-- Меню клана -->
+        <div id="clan-menu" class="screen">
+            <div class="menu-content">
+                <h2>Кланы</h2>
+                <div class="clan-info-panel">
+                    <h3>Ваш клан</h3>
+                    <div id="current-clan">
+                        <p>Вы не состоите в клане</p>
+                        <button class="menu-btn" onclick="createClan()">Создать клан</button>
+                    </div>
+                </div>
+                <div class="clan-list">
+                    <h3>Доступные кланы</h3>
+                    <div class="clan-item">
+                        <div class="clan-details">
+                            <h4>Красные Драконы</h4>
+                            <div class="clan-stats">
+                                <p>Участников: 3/20</p>
+                                <p>Территория: 5 заведений</p>
+                            </div>
+                        </div>
+                        <button class="menu-btn" onclick="joinClan('red_dragons')">Вступить</button>
+                    </div>
+                </div>
+                <button class="menu-btn" onclick="showMainMenu()">Назад</button>
+            </div>
+        </div>
+
+        <!-- Инвентарь -->
+        <div id="inventory-menu" class="screen">
+            <div class="menu-content">
+                <h2>Инвентарь</h2>
+                <div class="inventory-tabs">
+                    <button class="tab-btn active" onclick="showInventoryTab('cards')">Карты</button>
+                    <button class="tab-btn" onclick="showInventoryTab('upgrades')">Улучшения</button>
+                    <button class="tab-btn" onclick="showInventoryTab('protection')">Защита</button>
+                </div>
+                <div class="inventory-content">
+                    <div id="cards-tab" class="tab-content active">
+                        <h3>Карты для дуэлей</h3>
+                        <div class="inventory-item">
+                            <div class="item-info">
+                                <h4>Пистолет</h4>
+                                <p class="item-description">Надежное огнестрельное оружие</p>
+                            </div>
+                            <div class="item-actions">
+                                <button class="action-btn">Использовать</button>
+                            </div>
+                        </div>
+                        <div class="inventory-item">
+                            <div class="item-info">
+                                <h4>Бронежилет</h4>
+                                <p class="item-description">Защищает от огнестрельного оружия</p>
+                            </div>
+                            <div class="item-actions">
+                                <button class="action-btn">Использовать</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="upgrades-tab" class="tab-content">
+                        <h3>Улучшения заведений</h3>
+                        <p>Улучшения будут доступны после захвата заведений</p>
+                    </div>
+                    <div id="protection-tab" class="tab-content">
+                        <h3>Защита</h3>
+                        <p>Защита будет доступна в магазине</p>
+                    </div>
+                </div>
+                <button class="menu-btn" onclick="showMainMenu()">Назад</button>
+            </div>
+        </div>
+
+        <!-- Достижения -->
+        <div id="achievements-menu" class="screen">
+            <div class="menu-content">
+                <h2>Достижения</h2>
+                <div class="achievement">
+                    <div class="achievement-icon">🎯</div>
+                    <div class="achievement-info">
+                        <h4>Первый захват</h4>
+                        <p class="achievement-description">Захватите первое заведение</p>
+                        <p>Награда: $100</p>
+                    </div>
+                </div>
+                <div class="achievement">
+                    <div class="achievement-icon">🏢</div>
+                    <div class="achievement-info">
+                        <h4>Владелец территории</h4>
+                        <p class="achievement-description">Захватите 10 заведений</p>
+                        <p>Награда: $500</p>
+                    </div>
+                </div>
+                <button class="menu-btn" onclick="showMainMenu()">Назад</button>
+            </div>
+        </div>
+
+        <!-- Настройки -->
+        <div id="settings-menu" class="screen">
+            <div class="menu-content">
+                <h2>Настройки</h2>
+                <div class="settings-content">
+                    <div class="setting-item">
+                        <label>Звук:</label>
+                        <input type="checkbox" id="sound-toggle" checked>
+                    </div>
+                    <div class="setting-item">
+                        <label>Уведомления:</label>
+                        <input type="checkbox" id="notifications-toggle" checked>
+                    </div>
+                    <div class="setting-item">
+                        <label>Автозахват:</label>
+                        <input type="checkbox" id="auto-capture-toggle">
+                    </div>
+                </div>
+                <button class="menu-btn" onclick="showMainMenu()">Назад</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Уведомления -->
+    <div id="notifications"></div>
+
+    <script>
+        // Демо-функции
+        function startDemo() {
+            document.getElementById('loading-screen').classList.remove('active');
+            document.getElementById('main-menu').classList.add('active');
+        }
+
+        function showDemoMap() {
+            document.getElementById('main-menu').classList.remove('active');
+            document.getElementById('demo-map').classList.add('active');
+        }
+
+        function showMainMenu() {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById('main-menu').classList.add('active');
+        }
+
+        function showClanMenu() {
+            document.getElementById('main-menu').classList.remove('active');
+            document.getElementById('clan-menu').classList.add('active');
+        }
+
+        function showInventory() {
+            document.getElementById('main-menu').classList.remove('active');
+            document.getElementById('inventory-menu').classList.add('active');
+        }
+
+        function showAchievements() {
+            document.getElementById('main-menu').classList.remove('active');
+            document.getElementById('achievements-menu').classList.add('active');
+        }
+
+        function showSettings() {
+            document.getElementById('main-menu').classList.remove('active');
+            document.getElementById('settings-menu').classList.add('active');
+        }
+
+        function selectDemoVenue(venueId) {
+            alert('В полной версии здесь будет панель захвата заведения!');
+        }
+
+        function createClan() {
+            const name = prompt('Введите название клана:');
+            if (name) {
+                alert(`Клан "${name}" создан!`);
+            }
+        }
+
+        function joinClan(clanId) {
+            alert('Вы вступили в клан!');
+        }
+
+        function showInventoryTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Скрываем все кнопки вкладок
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Показываем выбранную вкладку
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            document.querySelector(`[onclick="showInventoryTab('${tabName}')"]`).classList.add('active');
+        }
+
+        // Стили для демо
+        const style = document.createElement('style');
+        style.textContent = `
+            .demo-map-container {
+                padding: 2rem;
+                text-align: center;
+            }
+            
+            .demo-venues {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1rem;
+                margin: 2rem 0;
+            }
+            
+            .demo-venue {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid #4ecdc4;
+                border-radius: 10px;
+                padding: 1rem;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            }
+            
+            .demo-venue:hover {
+                transform: translateY(-5px);
+                background: rgba(78, 205, 196, 0.2);
+            }
+            
+            .demo-venue h3 {
+                color: #4ecdc4;
+                margin-bottom: 0.5rem;
+            }
+            
+            .demo-venue p {
+                margin: 0.25rem 0;
+                color: #ccc;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
+

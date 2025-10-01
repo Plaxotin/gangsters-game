@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gangsters: Real City - Story</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Story page specific styles */
+        .story-page {
+            background: var(--deep-black);
+            color: var(--cream);
+            min-height: 100vh;
+            overflow-y: auto;
+        }
+
+        .story-hero {
+            background: linear-gradient(135deg, var(--deep-black) 0%, var(--charcoal-black) 100%);
+            padding: 120px 0 80px;
+            text-align: center;
+            position: relative;
+        }
+
+        .story-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M 10 0 L 0 0 0 10" fill="none" stroke="%23d4af37" stroke-width="0.5" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grid)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .story-hero-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .story-hero h1 {
+            font-family: var(--font-serif);
+            font-size: 3.5rem;
+            color: var(--warm-gold);
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .story-hero p {
+            font-size: 1.25rem;
+            color: var(--cream);
+            opacity: 0.9;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .story-section {
+            padding: 80px 0;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-left: 2rem;
+            padding-right: 2rem;
+        }
+
+        .story-section h2 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            color: var(--warm-gold);
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .story-section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--warm-gold), var(--copper));
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            margin-bottom: 4rem;
+            align-items: center;
+        }
+
+        .game-info.reverse {
+            direction: rtl;
+        }
+
+        .game-info.reverse > * {
+            direction: ltr;
+        }
+
+        .game-text {
+            padding: 2rem;
+        }
+
+        .game-text h3 {
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            color: var(--warm-gold);
+            margin-bottom: 1rem;
+        }
+
+        .game-text p {
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            color: var(--cream);
+        }
+
+        .game-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .game-features li {
+            padding: 0.5rem 0;
+            color: var(--cream);
+            position: relative;
+            padding-left: 2rem;
+        }
+
+        .game-features li::before {
+            content: '▸';
+            color: var(--warm-gold);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .game-screenshot {
+            background: var(--charcoal-black);
+            border: 2px solid var(--warm-gold);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .game-screenshot img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-screenshot .placeholder {
+            background: var(--charcoal-black);
+            border: 2px dashed var(--warm-gold);
+            border-radius: 4px;
+            padding: 3rem 2rem;
+            color: var(--warm-gold);
+            font-style: italic;
+        }
+
+        .inspiration-section {
+            background: linear-gradient(135deg, var(--charcoal-black) 0%, var(--deep-black) 100%);
+            padding: 80px 0;
+            margin: 80px 0;
+            border-top: 2px solid var(--warm-gold);
+            border-bottom: 2px solid var(--warm-gold);
+        }
+
+        .inspiration-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            text-align: center;
+        }
+
+        .inspiration-content h2 {
+            font-family: var(--font-serif);
+            font-size: 2.5rem;
+            color: var(--warm-gold);
+            margin-bottom: 2rem;
+        }
+
+        .inspiration-content p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--cream);
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+
+        .modern-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--deep-black);
+            border: 2px solid var(--warm-gold);
+            border-radius: 8px;
+            padding: 2rem;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.2);
+        }
+
+        .feature-card h3 {
+            font-family: var(--font-serif);
+            color: var(--warm-gold);
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--cream);
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .story-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .story-hero p {
+                font-size: 1.1rem;
+            }
+            
+            .game-info {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .story-section h2 {
+                font-size: 2rem;
+            }
+            
+            .game-text h3 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="story-page">
+    <!-- Header -->
+    <header class="header" style="position: fixed; top: 0; left: 0; right: 0; z-index: 1000; background: var(--deep-black); border-bottom: 2px solid var(--warm-gold); padding: 1rem 0;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; display: flex; justify-content: space-between; align-items: center;">
+            <div class="logo" style="display: flex; align-items: center; gap: 0.75rem;">
+                <div class="logo-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--warm-gold), var(--copper)); display: flex; align-items: center; justify-content: center;">
+                    <span style="color: var(--deep-black); font-weight: bold; font-size: 1.25rem;">G</span>
+                </div>
+                <span class="logo-text" style="font-family: var(--font-serif); color: var(--warm-gold); font-size: 1.5rem; font-weight: 700;">GANGSTERS</span>
+            </div>
+            
+            <nav class="nav" style="display: flex; gap: 2rem;">
+                <a href="landing-page.html" style="color: var(--cream); text-decoration: none; font-weight: 500; transition: color 0.3s ease;">Home</a>
+                <a href="story.html" style="color: var(--warm-gold); text-decoration: none; font-weight: 500; transition: color 0.3s ease;">Story</a>
+                <a href="main-page.html" style="color: var(--cream); text-decoration: none; font-weight: 500; transition: color 0.3s ease;">Game Map</a>
+                <button class="header-btn" onclick="showSubscribeModal()" style="background: linear-gradient(45deg, var(--steel-blue), var(--midnight-blue)); border: 2px solid var(--warm-gold); color: var(--cream); padding: 0.75rem 1.5rem; border-radius: 4px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">Pre-Register</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Story Hero -->
+    <section class="story-hero">
+        <div class="story-hero-content">
+            <h1>Наследие Gangsters</h1>
+            <p>Откройте историю культовых PC игр, которые вдохновили создание революционной мобильной MMO</p>
+        </div>
+    </section>
+
+    <!-- Gangsters (1992) -->
+    <section class="story-section">
+        <h2>Gangsters (1992)</h2>
+        
+        <div class="game-info">
+            <div class="game-text">
+                <h3>Революционная стратегия</h3>
+                <p>Первая игра в серии Gangsters, выпущенная в 1992 году, стала настоящим прорывом в жанре стратегических игр. Разработанная студией Hothouse Creations и изданная Eidos Interactive, игра предложила уникальный геймплей управления криминальной империей.</p>
+                
+                <p>Игроки брали на себя роль криминального босса, который должен был строить свою империю в вымышленном американском городе 1920-х годов. Игра сочетала элементы стратегии, экономической симуляции и тактических боевых действий.</p>
+                
+                <ul class="game-features">
+                    <li>Управление криминальными группировками</li>
+                    <li>Экономическая система и торговля</li>
+                    <li>Тактические боевые действия</li>
+                    <li>Дипломатия между группировками</li>
+                    <li>Уникальная атмосфера эпохи джаза</li>
+                </ul>
+            </div>
+            
+            <div class="game-screenshot">
+                <img src="gangsters screenshots/gangsters_organized_crime.jpg" alt="Gangsters 1992 Screenshot">
+                <div style="margin-top: 1rem; text-align: center;">
+                    <img src="gangsters screenshots/gangsters_organized_crime_interface.jpeg" alt="Gangsters Interface" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gangsters 2: Vendetta (1998) -->
+    <section class="story-section">
+        <h2>Gangsters 2: Vendetta (1998)</h2>
+        
+        <div class="game-info reverse">
+            <div class="game-text">
+                <h3>Эволюция жанра</h3>
+                <p>Шесть лет спустя, в 1998 году, вышла вторая часть серии - Gangsters 2: Vendetta. Эта игра значительно улучшила геймплей оригинала, добавив новые механики и более глубокую проработку игровых систем.</p>
+                
+                <p>Gangsters 2 представила улучшенную графику, более детальную систему управления персонажами и расширенные возможности дипломатии. Игра получила высокие оценки критиков и стала культовой среди поклонников стратегических игр.</p>
+                
+                <ul class="game-features">
+                    <li>Улучшенная система управления персонажами</li>
+                    <li>Расширенная дипломатическая система</li>
+                    <li>Более детальная экономика</li>
+                    <li>Улучшенная графика и интерфейс</li>
+                    <li>Множественные сценарии и кампании</li>
+                </ul>
+            </div>
+            
+            <div class="game-screenshot">
+                <img src="gangsters screenshots/Gangsters 2 disc.jpg" alt="Gangsters 2 Disc">
+                <div style="margin-top: 1rem; text-align: center;">
+                    <img src="gangsters screenshots/gangsters_2_interface.webp" alt="Gangsters 2 Interface" style="max-width: 100%; height: auto;">
+                </div>
+                <div style="margin-top: 1rem; text-align: center;">
+                    <img src="gangsters screenshots/gangsters 2.webp" alt="Gangsters 2 Vendetta Screenshot" style="max-width: 100%; height: auto;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Inspiration Section -->
+    <section class="inspiration-section">
+        <div class="inspiration-content">
+            <h2>Наследие в современности</h2>
+            <p>Gangsters: Real City продолжает традиции легендарных PC игр, адаптируя их культовый геймплей для современной мобильной эры. Мы взяли лучшие элементы классических игр и объединили их с инновационными технологиями GPS и дополненной реальности.</p>
+            
+            <div class="modern-features">
+                <div class="feature-card">
+                    <h3>Реальный мир</h3>
+                    <p>Играйте в настоящих городах, используя GPS-технологии для создания заведений в реальных локациях</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>Мобильная MMO</h3>
+                    <p>Сотни игроков одновременно борются за контроль над территориями в вашем городе</p>
+                </div>
+                
+                <div class="feature-card">
+                    <h3>Социальные функции</h3>
+                    <p>Общайтесь с другими игроками, создавайте альянсы и координируйте атаки</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer style="background: var(--charcoal-black); border-top: 2px solid var(--warm-gold); padding: 2rem 0;">
+        <div class="container" style="max-width: 1200px; margin: 0 auto; padding: 0 2rem; text-align: center;">
+            <div style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem;">
+                <div style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--warm-gold), var(--copper)); display: flex; align-items: center; justify-content: center;">
+                    <span style="color: var(--deep-black); font-weight: bold; font-size: 1rem;">G</span>
+                </div>
+                <span style="font-family: var(--font-serif); color: var(--warm-gold); font-size: 1.25rem; font-weight: 700;">GANGSTERS: REAL CITY</span>
+            </div>
+            <p style="color: var(--cream); font-size: 0.9rem; opacity: 0.8; margin-bottom: 1rem;">
+                Revolutionary location-based MMO • GPS conquest • Real establishments
+            </p>
+            <div style="border-top: 1px solid rgba(74, 74, 74, 0.4); padding-top: 1rem;">
+                <p style="color: var(--cream); font-size: 0.8rem; opacity: 0.6;">
+                    © 2024 Gangsters: Real City. All rights reserved. | 
+                    <a href="#" style="color: var(--warm-gold); text-decoration: none;">Privacy Policy</a> | 
+                    <a href="#" style="color: var(--warm-gold); text-decoration: none;">Terms of Service</a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Subscribe Modal -->
+    <div id="subscribe-modal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 1000;">
+        <div class="modal-content" style="background: var(--deep-black); border: 2px solid var(--warm-gold); border-radius: 8px; padding: 2rem; max-width: 400px; width: 90%; position: relative;">
+            <button class="close-modal" onclick="closeSubscribeModal()" style="position: absolute; top: 1rem; right: 1rem; background: none; border: none; color: var(--warm-gold); font-size: 1.5rem; cursor: pointer;">&times;</button>
+            
+            <div class="modal-header" style="text-align: center; margin-bottom: 2rem;">
+                <div class="logo" style="display: flex; align-items: center; justify-content: center; gap: 0.75rem; margin-bottom: 1rem;">
+                    <div class="logo-icon" style="width: 40px; height: 40px; background: linear-gradient(135deg, var(--warm-gold), var(--copper)); display: flex; align-items: center; justify-content: center;">
+                        <span style="color: var(--deep-black); font-weight: bold; font-size: 1.25rem;">G</span>
+                    </div>
+                    <span style="font-family: var(--font-serif); color: var(--warm-gold); font-size: 1.5rem; font-weight: 700;">GANGSTERS</span>
+                </div>
+                <h3 style="color: var(--cream); font-size: 1.5rem; margin-bottom: 0.5rem;">Подписка на обновления</h3>
+                <p style="color: var(--cream); opacity: 0.8; font-size: 0.9rem;">Будьте первыми, кто узнает о запуске Gangsters: Real City</p>
+            </div>
+            
+            <form id="subscribe-form" onsubmit="handleSubscribe(event)" style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="form-group">
+                    <label for="email" style="color: var(--warm-gold); font-weight: 600; margin-bottom: 0.5rem; display: block;">Email адрес</label>
+                    <input type="email" id="email" name="email" required 
+                           style="width: 100%; padding: 0.75rem; background: rgba(46, 46, 46, 0.6); border: 1px solid var(--warm-gold); border-radius: 4px; color: var(--cream); font-size: 1rem;"
+                           placeholder="your@email.com">
+                </div>
+                
+                <button type="submit" class="subscribe-btn" 
+                        style="background: linear-gradient(45deg, var(--steel-blue), var(--midnight-blue)); border: 2px solid var(--warm-gold); color: var(--cream); padding: 0.75rem 1.5rem; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 1rem; transition: all 0.3s ease;">
+                    Subscribe
+                </button>
+            </form>
+            
+            <div id="subscribe-success" style="display: none; text-align: center; padding: 1rem; background: rgba(46, 125, 50, 0.2); border: 1px solid #4caf50; border-radius: 4px; margin-top: 1rem;">
+                <p style="color: #4caf50; font-weight: 600;">✅ Спасибо! Вы подписаны на обновления</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Subscribe modal functions
+        function showSubscribeModal() {
+            const modal = document.getElementById('subscribe-modal');
+            modal.style.display = 'flex';
+            modal.style.alignItems = 'center';
+            modal.style.justifyContent = 'center';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSubscribeModal() {
+            document.getElementById('subscribe-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+
+        function handleSubscribe(event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            
+            // Simulate subscription process
+            console.log('Subscribing email:', email);
+            
+            // Show success message
+            document.getElementById('subscribe-form').style.display = 'none';
+            document.getElementById('subscribe-success').style.display = 'block';
+            
+            // Close modal after 2 seconds
+            setTimeout(() => {
+                closeSubscribeModal();
+                // Reset form
+                document.getElementById('subscribe-form').style.display = 'flex';
+                document.getElementById('subscribe-success').style.display = 'none';
+                document.getElementById('email').value = '';
+            }, 2000);
+        }
+
+        // Close modal when clicking outside
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('subscribe-modal');
+            if (event.target === modal) {
+                closeSubscribeModal();
+            }
+        });
+    </script>
+</body>
+</html>
