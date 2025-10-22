@@ -1,0 +1,79 @@
+name: CodeRabbit Review
+
+# Запускать на каждом pull request
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  pull_request_review:
+    types: [submitted]
+
+# Разрешить запуск от имени GitHub Actions
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  statuses: write
+
+jobs:
+  coderabbit:
+    name: CodeRabbit Review
+    runs-on: ubuntu-latest
+    
+    # Пропустить для draft PR
+    if: github.event.pull_request.draft == false
+    
+    steps:
+      - name: Checkout код
+        uses: actions/checkout@v4
+        with:
+          # Получить полную историю для лучшего анализа
+          fetch-depth: 0
+          
+      - name: Настроить Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          
+      - name: Установить зависимости
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+          fi
+          if [ -f "1920s Style Game Website/package.json" ]; then
+            cd "1920s Style Game Website"
+            npm ci
+            cd ..
+          fi
+          
+      - name: Запустить CodeRabbit
+        uses: coderabbitai/coderabbit-action@v1.0.0
+        with:
+          # GitHub токен (автоматически предоставляется)
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Настройки CodeRabbit
+          config_file: .coderabbit.yaml
+          
+          # Включить детальное логирование
+          debug: true
+          
+          # Включить анализ безопасности
+          security: true
+          
+          # Включить анализ производительности
+          performance: true
+          
+          # Язык комментариев
+          language: ru
+          
+          # Максимальное количество комментариев
+          max_comments: 50
+          
+          # Включить анализ игрового кода
+          game_analysis: true
+          
+      - name: Проверить результаты CodeRabbit
+        run: |
+          echo "CodeRabbit анализ завершен"
+          echo "Проверьте комментарии в PR для получения рекомендаций"

@@ -1,0 +1,57 @@
+# CODEOWNERS файл для проекта Gangsters: Real City
+# Документация: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Глобальные владельцы (все файлы по умолчанию)
+* @your-username
+
+# Основные игровые файлы
+/game.js @your-username
+/map.js @your-username
+/player.js @your-username
+/clan.js @your-username
+/economy.js @your-username
+/duel.js @your-username
+/events.js @your-username
+/ui.js @your-username
+
+# HTML и CSS файлы
+/index.html @your-username
+/styles.css @your-username
+/main-page.html @your-username
+/story.html @your-username
+
+# React приложение (1920s Style Game Website)
+/1920s\ Style\ Game\ Website/ @your-username
+/1920s\ Style\ Game\ Website/src/ @your-username
+/1920s\ Style\ Game\ Website/src/components/ @your-username
+/1920s\ Style\ Game\ Website/src/components/ui/ @your-username
+
+# Конфигурационные файлы
+/package.json @your-username
+/vite.config.ts @your-username
+/.coderabbit.yaml @your-username
+/.github/ @your-username
+
+# Документация
+/README.md @your-username
+/*.md @your-username
+
+# Системные файлы
+/admin-tools.js @your-username
+/data-sync.js @your-username
+/github-sync.js @your-username
+/map-customization.js @your-username
+/map-theme.js @your-username
+/player-registration.js @your-username
+/territory-system.js @your-username
+
+# Исключения (файлы, которые не требуют ревью)
+/gangsters\ screenshots/ @your-username
+/фото\ Москвы/ @your-username
+/icon/ @your-username
+*.jpg @your-username
+*.jpeg @your-username
+*.png @your-username
+*.webp @your-username
+*.pdf @your-username
+*.docx @your-username

@@ -1,0 +1,151 @@
+# CodeRabbit Configuration
+# Документация: https://docs.coderabbit.ai/guides/coderabbit-yaml
+
+# Общие настройки
+general:
+  # Включить CodeRabbit для всех pull requests
+  enable: true
+  
+  # Язык для комментариев (ru для русского, en для английского)
+  language: ru
+  
+  # Максимальное количество комментариев на PR
+  max_comments: 50
+  
+  # Включить анализ безопасности
+  security: true
+  
+  # Включить анализ производительности
+  performance: true
+
+# Настройки для разных типов файлов
+files:
+  # JavaScript/TypeScript файлы
+  "**/*.{js,ts,jsx,tsx}":
+    # Включить анализ качества кода
+    quality: true
+    # Включить анализ безопасности
+    security: true
+    # Включить анализ производительности
+    performance: true
+    # Включить анализ доступности
+    accessibility: true
+    
+  # HTML файлы
+  "**/*.html":
+    quality: true
+    security: true
+    accessibility: true
+    
+  # CSS файлы
+  "**/*.{css,scss,sass}":
+    quality: true
+    performance: true
+    
+  # JSON файлы
+  "**/*.json":
+    quality: true
+    security: true
+    
+  # Markdown файлы
+  "**/*.md":
+    quality: true
+
+# Настройки для игрового проекта
+project:
+  # Тип проекта
+  type: "web-game"
+  
+  # Основные технологии
+  technologies:
+    - "javascript"
+    - "html"
+    - "css"
+    - "yandex-maps-api"
+    - "react"
+    - "vite"
+  
+  # Игровые механики для анализа
+  game_mechanics:
+    - "geolocation"
+    - "real-time"
+    - "economy"
+    - "clans"
+    - "duels"
+
+# Настройки комментариев
+comments:
+  # Стиль комментариев
+  style: "friendly"
+  
+  # Включить эмодзи
+  emojis: true
+  
+  # Максимальная длина комментария
+  max_length: 500
+  
+  # Включить предложения по рефакторингу
+  refactoring: true
+  
+  # Включить предложения по оптимизации
+  optimization: true
+
+# Исключения
+exclude:
+  # Исключить файлы с изображениями
+  - "**/*.{png,jpg,jpeg,gif,svg,webp}"
+  
+  # Исключить файлы документации
+  - "**/README.md"
+  - "**/CHANGELOG.md"
+  
+  # Исключить файлы конфигурации
+  - "**/package-lock.json"
+  - "**/yarn.lock"
+  
+  # Исключить временные файлы
+  - "**/node_modules/**"
+  - "**/dist/**"
+  - "**/build/**"
+
+# Настройки для игрового кода
+game_specific:
+  # Анализ игровых механик
+  mechanics_analysis: true
+  
+  # Проверка баланса игры
+  balance_check: true
+  
+  # Анализ производительности игрового цикла
+  performance_analysis: true
+  
+  # Проверка безопасности игровых данных
+  data_security: true
+
+# Настройки интеграции
+integrations:
+  # GitHub интеграция
+  github:
+    # Включить автоматические комментарии
+    auto_comment: true
+    
+    # Включить проверку статуса
+    status_checks: true
+    
+    # Включить автоматическое назначение ревьюеров
+    auto_assign: false
+  
+  # Slack интеграция (если настроена)
+  slack:
+    enabled: false
+
+# Настройки обучения
+learning:
+  # Включить обучение на основе вашего кода
+  enabled: true
+  
+  # Включить анализ паттернов кода
+  pattern_analysis: true
+  
+  # Включить предложения по архитектуре
+  architecture_suggestions: true
