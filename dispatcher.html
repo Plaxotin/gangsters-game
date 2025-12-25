@@ -1,0 +1,370 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Автобаза угольного разреза — рабочее место диспетчера</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dispatcher.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="gangster-atmosphere">
+  <div class="dispatch-app" id="dispatch-app">
+    <header class="dispatch-topbar">
+      <div class="dispatch-topbar__left">
+        <div class="dispatch-brand">
+          <div class="dispatch-brand__mark" aria-hidden="true">⛏</div>
+          <div class="dispatch-brand__text">
+            <div class="dispatch-brand__title">Автобаза угольного разреза</div>
+            <div class="dispatch-brand__subtitle">Рабочее место диспетчера</div>
+          </div>
+        </div>
+        <div class="dispatch-sep" aria-hidden="true"></div>
+        <div class="dispatch-shift">
+          <div class="dispatch-shift__row">
+            <span class="dispatch-label">Смена</span>
+            <select id="shift-select" class="dispatch-select" aria-label="Выбор смены">
+              <option value="day">День (08:00–20:00)</option>
+              <option value="night">Ночь (20:00–08:00)</option>
+            </select>
+          </div>
+          <div class="dispatch-shift__row">
+            <span class="dispatch-label">Диспетчер</span>
+            <input id="dispatcher-name" class="dispatch-input" type="text" value="Иван Петров" />
+          </div>
+        </div>
+      </div>
+
+      <div class="dispatch-topbar__right">
+        <div class="dispatch-connection" id="connection-indicator" title="Состояние синхронизации">
+          <span class="dispatch-connection__dot" aria-hidden="true"></span>
+          <span class="dispatch-connection__text">Локально</span>
+        </div>
+        <button class="dispatch-btn dispatch-btn--ghost dispatch-theme-toggle" id="theme-toggle" type="button" title="Переключить тему">
+          <span class="dispatch-theme-toggle__label">Тема:</span>
+          <strong id="theme-label">Тёмная</strong>
+        </button>
+        <div class="dispatch-clock" id="clock">—</div>
+        <div class="dispatch-search">
+          <input id="global-search" class="dispatch-input dispatch-input--search" placeholder="Поиск: борт, водитель, заявка… (/) " />
+          <button class="dispatch-btn dispatch-btn--ghost" id="clear-search" type="button" title="Очистить">×</button>
+        </div>
+        <div class="dispatch-actions">
+          <button class="dispatch-btn dispatch-btn--primary" id="btn-new-trip" type="button">+ Рейс</button>
+          <button class="dispatch-btn" id="btn-new-order" type="button">+ Заявка</button>
+          <button class="dispatch-btn dispatch-btn--danger" id="btn-reset-demo" type="button" title="Сбросить демо-данные">Сброс</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="dispatch-shell">
+      <aside class="dispatch-sidebar" aria-label="Навигация">
+        <nav class="dispatch-nav" role="tablist" aria-label="Разделы">
+          <button class="dispatch-nav__item is-active" data-tab="overview" role="tab" aria-selected="true">Сводка</button>
+          <button class="dispatch-nav__item" data-tab="fleet" role="tab" aria-selected="false">Техника</button>
+          <button class="dispatch-nav__item" data-tab="orders" role="tab" aria-selected="false">Заявки</button>
+          <button class="dispatch-nav__item" data-tab="trips" role="tab" aria-selected="false">Рейсы</button>
+          <button class="dispatch-nav__item" data-tab="log" role="tab" aria-selected="false">Журнал</button>
+        </nav>
+
+        <section class="dispatch-sidecard" aria-label="Оперативные фильтры">
+          <div class="dispatch-sidecard__title">Фильтры</div>
+          <label class="dispatch-field">
+            <span class="dispatch-field__label">Статус техники</span>
+            <select id="fleet-status-filter" class="dispatch-select">
+              <option value="all">Все</option>
+              <option value="on_line">На линии</option>
+              <option value="loading">Погрузка</option>
+              <option value="queue">Очередь</option>
+              <option value="fuel">Топливо</option>
+              <option value="repair">Ремонт</option>
+            </select>
+          </label>
+          <label class="dispatch-field">
+            <span class="dispatch-field__label">Приоритет заявок</span>
+            <select id="order-priority-filter" class="dispatch-select">
+              <option value="all">Все</option>
+              <option value="P1">P1 (срочно)</option>
+              <option value="P2">P2 (в план)</option>
+              <option value="P3">P3 (низкий)</option>
+            </select>
+          </label>
+          <label class="dispatch-field">
+            <span class="dispatch-field__label">Только критические</span>
+            <input id="only-critical" type="checkbox" class="dispatch-checkbox" />
+          </label>
+        </section>
+
+        <section class="dispatch-sidecard" aria-label="Подсказки">
+          <div class="dispatch-sidecard__title">Горячие клавиши</div>
+          <div class="dispatch-kbdlist">
+            <div class="dispatch-kbdrow"><span class="dispatch-kbd">/</span><span>Поиск</span></div>
+            <div class="dispatch-kbdrow"><span class="dispatch-kbd">N</span><span>Новая заявка</span></div>
+            <div class="dispatch-kbdrow"><span class="dispatch-kbd">T</span><span>Новый рейс</span></div>
+            <div class="dispatch-kbdrow"><span class="dispatch-kbd">Esc</span><span>Закрыть окно</span></div>
+          </div>
+        </section>
+      </aside>
+
+      <main class="dispatch-main">
+        <section class="dispatch-kpis" aria-label="Показатели смены">
+          <div class="dispatch-kpi">
+            <div class="dispatch-kpi__label">На линии</div>
+            <div class="dispatch-kpi__value" id="kpi-on-line">—</div>
+          </div>
+          <div class="dispatch-kpi">
+            <div class="dispatch-kpi__label">В погрузке</div>
+            <div class="dispatch-kpi__value" id="kpi-loading">—</div>
+          </div>
+          <div class="dispatch-kpi">
+            <div class="dispatch-kpi__label">В очереди</div>
+            <div class="dispatch-kpi__value" id="kpi-queue">—</div>
+          </div>
+          <div class="dispatch-kpi">
+            <div class="dispatch-kpi__label">В ремонте</div>
+            <div class="dispatch-kpi__value" id="kpi-repair">—</div>
+          </div>
+          <div class="dispatch-kpi dispatch-kpi--alert">
+            <div class="dispatch-kpi__label">Критические</div>
+            <div class="dispatch-kpi__value" id="kpi-critical">—</div>
+          </div>
+        </section>
+
+        <section class="dispatch-panel" data-panel="overview">
+          <header class="dispatch-panel__header">
+            <div class="dispatch-panel__title">Сводка</div>
+            <div class="dispatch-panel__meta" id="shift-meta">—</div>
+          </header>
+          <div class="dispatch-panel__body dispatch-grid">
+            <div class="dispatch-card">
+              <div class="dispatch-card__title">Оперативные задания</div>
+              <div class="dispatch-card__subtitle">Назначайте рейсы из очереди заявок</div>
+              <div id="overview-queue" class="dispatch-list" aria-label="Очередь заявок"></div>
+            </div>
+            <div class="dispatch-card">
+              <div class="dispatch-card__title">План‑факт (тонны)</div>
+              <div class="dispatch-card__subtitle">Смена: перевозка на склад/перегруз</div>
+              <div class="dispatch-planfact">
+                <div class="dispatch-planfact__row">
+                  <span>План</span>
+                  <strong id="plan-tons">—</strong>
+                </div>
+                <div class="dispatch-planfact__row">
+                  <span>Факт</span>
+                  <strong id="fact-tons">—</strong>
+                </div>
+                <div class="dispatch-planfact__bar" aria-hidden="true">
+                  <div class="dispatch-planfact__fill" id="planfact-fill" style="width: 0%"></div>
+                </div>
+                <div class="dispatch-planfact__hint" id="planfact-hint">—</div>
+              </div>
+            </div>
+            <div class="dispatch-card">
+              <div class="dispatch-card__title">Последние события</div>
+              <div class="dispatch-card__subtitle">Журнал изменений статуса</div>
+              <div id="overview-log" class="dispatch-list" aria-label="Последние события"></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="dispatch-panel is-hidden" data-panel="fleet">
+          <header class="dispatch-panel__header">
+            <div class="dispatch-panel__title">Техника</div>
+            <div class="dispatch-panel__meta">Клик по строке открывает карточку</div>
+          </header>
+          <div class="dispatch-panel__body">
+            <div class="dispatch-tablewrap">
+              <table class="dispatch-table" aria-label="Список техники">
+                <thead>
+                  <tr>
+                    <th>Борт</th>
+                    <th>Тип</th>
+                    <th>Водитель</th>
+                    <th>Статус</th>
+                    <th>Локация</th>
+                    <th>Топливо</th>
+                    <th>Груз, т</th>
+                    <th>ETA</th>
+                    <th>Обновлено</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="fleet-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="dispatch-panel is-hidden" data-panel="orders">
+          <header class="dispatch-panel__header">
+            <div class="dispatch-panel__title">Заявки</div>
+            <div class="dispatch-panel__meta">Очередь на погрузку/вывоз</div>
+          </header>
+          <div class="dispatch-panel__body">
+            <div class="dispatch-tablewrap">
+              <table class="dispatch-table" aria-label="Список заявок">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Приоритет</th>
+                    <th>Маршрут</th>
+                    <th>Тонны</th>
+                    <th>Статус</th>
+                    <th>Назначено</th>
+                    <th>Создано</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="dispatch-panel is-hidden" data-panel="trips">
+          <header class="dispatch-panel__header">
+            <div class="dispatch-panel__title">Рейсы</div>
+            <div class="dispatch-panel__meta">Активные и завершенные</div>
+          </header>
+          <div class="dispatch-panel__body">
+            <div class="dispatch-tablewrap">
+              <table class="dispatch-table" aria-label="Список рейсов">
+                <thead>
+                  <tr>
+                    <th>ID</th>
+                    <th>Борт</th>
+                    <th>Водитель</th>
+                    <th>Маршрут</th>
+                    <th>Тонны</th>
+                    <th>Статус</th>
+                    <th>Старт</th>
+                    <th>Финиш</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="trips-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <section class="dispatch-panel is-hidden" data-panel="log">
+          <header class="dispatch-panel__header">
+            <div class="dispatch-panel__title">Журнал</div>
+            <div class="dispatch-panel__meta">Протокол действий диспетчера</div>
+          </header>
+          <div class="dispatch-panel__body">
+            <div class="dispatch-log" id="log-list" aria-label="Журнал событий"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal: New Trip / Assign -->
+  <div class="dispatch-modal is-hidden" id="modal-trip" role="dialog" aria-modal="true" aria-labelledby="modal-trip-title">
+    <div class="dispatch-modal__backdrop" data-close="modal-trip"></div>
+    <div class="dispatch-modal__panel">
+      <header class="dispatch-modal__header">
+        <div class="dispatch-modal__title" id="modal-trip-title">Назначить рейс</div>
+        <button class="dispatch-btn dispatch-btn--ghost" type="button" data-close="modal-trip" aria-label="Закрыть">×</button>
+      </header>
+      <div class="dispatch-modal__body">
+        <form id="trip-form" class="dispatch-form">
+          <div class="dispatch-form__grid">
+            <label class="dispatch-field">
+              <span class="dispatch-field__label">Заявка</span>
+              <select id="trip-order" class="dispatch-select" required></select>
+            </label>
+            <label class="dispatch-field">
+              <span class="dispatch-field__label">Техника (борт)</span>
+              <select id="trip-vehicle" class="dispatch-select" required></select>
+            </label>
+            <label class="dispatch-field">
+              <span class="dispatch-field__label">Водитель</span>
+              <select id="trip-driver" class="dispatch-select" required></select>
+            </label>
+            <label class="dispatch-field">
+              <span class="dispatch-field__label">Тонны</span>
+              <input id="trip-tons" class="dispatch-input" type="number" min="1" step="1" required />
+            </label>
+            <label class="dispatch-field dispatch-field--full">
+              <span class="dispatch-field__label">Примечание</span>
+              <input id="trip-note" class="dispatch-input" type="text" placeholder="Напр.: сменить водителя на перегрузе, проверка давления..." />
+            </label>
+          </div>
+        </form>
+      </div>
+      <footer class="dispatch-modal__footer">
+        <button class="dispatch-btn" type="button" data-close="modal-trip">Отмена</button>
+        <button class="dispatch-btn dispatch-btn--primary" form="trip-form" id="trip-submit" type="submit">Назначить</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: New Order -->
+  <div class="dispatch-modal is-hidden" id="modal-order" role="dialog" aria-modal="true" aria-labelledby="modal-order-title">
+    <div class="dispatch-modal__backdrop" data-close="modal-order"></div>
+    <div class="dispatch-modal__panel">
+      <header class="dispatch-modal__header">
+        <div class="dispatch-modal__title" id="modal-order-title">Новая заявка</div>
+        <button class="dispatch-btn dispatch-btn--ghost" type="button" data-close="modal-order" aria-label="Закрыть">×</button>
+      </header>
+      <div class="dispatch-modal__body">
+        <form id="order-form" class="dispatch-form">
+          <div class="dispatch-form__grid">
+            <label class="dispatch-field">
+              <span class="dispatch-field__label">Приоритет</span>
+              <select id="order-priority" class="dispatch-select" required>
+                <option value="P1">P1 (срочно)</option>
+                <option value="P2" selected>P2 (в план)</option>
+                <option value="P3">P3 (низкий)</option>
+              </select>
+            </label>
+            <label class="dispatch-field">
+              <span class="dispatch-field__label">Маршрут</span>
+              <select id="order-route" class="dispatch-select" required>
+                <option value="Карьер → Перегруз">Карьер → Перегруз</option>
+                <option value="Карьер → Склад">Карьер → Склад</option>
+                <option value="Перегруз → Склад">Перегруз → Склад</option>
+                <option value="Склад → Отгрузка">Склад → Отгрузка</option>
+              </select>
+            </label>
+            <label class="dispatch-field">
+              <span class="dispatch-field__label">Тонны</span>
+              <input id="order-tons" class="dispatch-input" type="number" min="1" step="1" value="60" required />
+            </label>
+            <label class="dispatch-field dispatch-field--full">
+              <span class="dispatch-field__label">Комментарий</span>
+              <input id="order-comment" class="dispatch-input" type="text" placeholder="Напр.: срочно на склад, ограничение по весам..." />
+            </label>
+          </div>
+        </form>
+      </div>
+      <footer class="dispatch-modal__footer">
+        <button class="dispatch-btn" type="button" data-close="modal-order">Отмена</button>
+        <button class="dispatch-btn dispatch-btn--primary" form="order-form" id="order-submit" type="submit">Создать</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Modal: Vehicle -->
+  <div class="dispatch-modal is-hidden" id="modal-vehicle" role="dialog" aria-modal="true" aria-labelledby="modal-vehicle-title">
+    <div class="dispatch-modal__backdrop" data-close="modal-vehicle"></div>
+    <div class="dispatch-modal__panel">
+      <header class="dispatch-modal__header">
+        <div class="dispatch-modal__title" id="modal-vehicle-title">Карточка техники</div>
+        <button class="dispatch-btn dispatch-btn--ghost" type="button" data-close="modal-vehicle" aria-label="Закрыть">×</button>
+      </header>
+      <div class="dispatch-modal__body">
+        <div id="vehicle-details" class="dispatch-details"></div>
+      </div>
+      <footer class="dispatch-modal__footer">
+        <button class="dispatch-btn" type="button" data-close="modal-vehicle">Закрыть</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="dispatcher.js"></script>
+</body>
+</html>
