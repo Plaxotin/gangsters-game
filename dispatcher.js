@@ -1,6 +1,7 @@
 /* Dispatcher screen — автономная демо-панель (localStorage) */
 
 const DISPATCH_STORAGE_KEY = "coal_dispatcher_state_v1";
+const DISPATCH_THEME_KEY = "coal_dispatcher_theme_v1";
 
 /** @typedef {{id:string, board:string, type:string, driverId:string|null, status:'on_line'|'loading'|'queue'|'fuel'|'repair', location:string, fuelPct:number, payloadTons:number, etaMin:number|null, updatedAt:number, critical:boolean, note?:string}} Vehicle */
 /** @typedef {{id:string, name:string, phone:string}} Driver */
@@ -228,6 +229,21 @@ function loadState() {
 /** @param {DispatchState} state */
 function saveState(state) {
   localStorage.setItem(DISPATCH_STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadTheme() {
+  const raw = localStorage.getItem(DISPATCH_THEME_KEY);
+  return raw === "light" ? "light" : "dark";
+}
+
+function saveTheme(theme) {
+  localStorage.setItem(DISPATCH_THEME_KEY, theme);
+}
+
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+  const label = document.getElementById("theme-label");
+  if (label) label.textContent = theme === "light" ? "Светлая" : "Тёмная";
 }
 
 /** @param {DispatchState} state */
@@ -929,6 +945,17 @@ function bindEvents(state) {
     setTimeout(() => setConnectionState("ok"), 700);
   });
 
+  // Theme toggle
+  const themeBtn = document.getElementById("theme-toggle");
+  if (themeBtn) {
+    themeBtn.addEventListener("click", () => {
+      const current = document.body.dataset.theme === "light" ? "light" : "dark";
+      const next = current === "light" ? "dark" : "light";
+      applyTheme(next);
+      saveTheme(next);
+    });
+  }
+
   // Search
   el("clear-search").addEventListener("click", () => {
     el("global-search").value = "";
@@ -1048,6 +1075,9 @@ function bindEvents(state) {
 function init() {
   /** @type {DispatchState} */
   const state = loadState();
+
+  // Theme
+  applyTheme(loadTheme());
 
   // Apply persisted settings to UI
   el("shift-select").value = state.settings.shift;

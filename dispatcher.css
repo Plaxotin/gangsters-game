@@ -238,6 +238,25 @@ body {
   white-space: nowrap;
 }
 
+.dispatch-theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.dispatch-theme-toggle__label {
+  color: var(--dispatch-muted);
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.dispatch-theme-toggle strong {
+  color: var(--warm-gold);
+  font-family: var(--font-serif);
+  letter-spacing: 0.02em;
+}
+
 .dispatch-shell {
   display: grid;
   grid-template-columns: 280px 1fr;
@@ -813,4 +832,68 @@ body {
   .dispatch-form__grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Light theme (scoped to dispatcher page via body[data-theme]) */
+body[data-theme="light"] {
+  --deep-black: #f6f4ef;
+  --charcoal-black: #ffffff;
+  --dark-navy: #263241;
+  --midnight-blue: #33485c;
+  --steel-blue: #2f455a;
+  --brick-red: #7a1f2d;
+  --dark-brick: #561620;
+  --concrete: #6b6b6b;
+  --dark-concrete: #e7e2d8;
+  --cream: #151515;
+  --warm-gold: #b99112;
+  --copper: #a0622a;
+
+  --dispatch-panel: rgba(255, 255, 255, 0.92);
+  --dispatch-panel-2: rgba(0, 0, 0, 0.04);
+  --dispatch-border: rgba(47, 69, 90, 0.25);
+  --dispatch-muted: rgba(21, 21, 21, 0.72);
+  --dispatch-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+}
+
+body[data-theme="light"].gangster-atmosphere {
+  background: radial-gradient(circle at 30% 70%, rgba(122, 31, 45, 0.06) 0%, transparent 55%),
+    radial-gradient(circle at 70% 30%, rgba(47, 69, 90, 0.07) 0%, transparent 55%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(246, 244, 239, 1) 100%);
+}
+
+body[data-theme="light"] .dispatch-topbar {
+  background: rgba(255, 255, 255, 0.78);
+  border-bottom-color: rgba(47, 69, 90, 0.25);
+}
+
+body[data-theme="light"] .dispatch-sidebar {
+  background: rgba(255, 255, 255, 0.75);
+  border-right-color: rgba(47, 69, 90, 0.18);
+}
+
+body[data-theme="light"] .dispatch-panel__header {
+  background: rgba(47, 69, 90, 0.06);
+}
+
+body[data-theme="light"] .dispatch-table th {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+body[data-theme="light"] .dispatch-btn--ghost {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+body[data-theme="light"] .dispatch-input,
+body[data-theme="light"] .dispatch-select {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+body[data-theme="light"] .dispatch-modal__panel {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(47, 69, 90, 0.3);
+}
+
+body[data-theme="light"] .dispatch-modal__backdrop {
+  background: rgba(0, 0, 0, 0.35);
 }
